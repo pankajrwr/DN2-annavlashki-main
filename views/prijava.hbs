@@ -4,7 +4,7 @@
       <h3><i class="fas fa-user"></i>Dodajanje nove stranke</h3>
       <div id="stranke">
         <form
-          action=""
+          action="/prijava/"
           method="post"
           enctype="multipart/form-data"
           autocomplete="off"
@@ -153,6 +153,11 @@
               placeholder="E-pošta"
             />
           </div>
+          {{#if error}}
+          <div>
+            <p>This is an error message {{error}}</p>
+          </div>
+          {{/if}}
           <div class="form-group">
             <p class="help-block">{{sporocilo}}</p>
             <input

@@ -3,13 +3,30 @@ if (!process.env.PORT) process.env.PORT = 8080;
 // Priprava povezave na podatkovno bazo
 const sqlite3 = require("sqlite3").verbose();
 const pb = new sqlite3.Database("MovieInvoice.sl3");
-
+const multer = require('multer');
 // Priprava dodatnih knjižnic
 const formidable = require("formidable");
 
 // Priprava strežnika
 const express = require("express");
+const bodyParser = require('body-parser')
+const upload = multer();
 const streznik = express();
+
+var flash = require('connect-flash');
+ 
+// streznik.configure(function() {
+  // streznik.use(express.cookieParser('keyboard cat'));
+  // streznik.use(express.session({ cookie: { maxAge: 60000 }}));
+  streznik.use(flash());
+// });
+
+streznik.use(bodyParser.json()); 
+streznik.use(bodyParser.urlencoded({ extended: true }));
+// var jsonParser = bodyParser.json()
+// var urlencodedParser = bodyParser.urlencoded({ extended: false })
+// for parsing multipart/form-data
+streznik.use(upload.array()); 
 streznik.set("view engine", "hbs");
 streznik.use(express.static("public"));
 
@@ -81,6 +98,19 @@ const vrniSeznamFilmov = (povratniKlic) => {
     }
   );
 };
+
+const getCustomerData = (zahteva, povratniKlic) => {
+  pb.all(
+    "SELECT * \
+   FROM   Customer \
+   WHERE  Customer.LastName IS NOT NULL ",
+    (napaka, vrstice) => {
+      if (napaka) povratniKlic(false);
+      else povratniKlic(vrstice);
+    }
+  );
+};
+// new one 
 
 // Vrni podrobnosti filma v košarici iz podatkovne baze
 const filmiIzKosarice = (zahteva, povratniKlic) => {
@@ -197,6 +227,16 @@ const najdiStrankoPoPriimku = (priimek, povratniKlic) => {
   );
 };
 
+streznik.get("/customers", (zahteva, odgovor) => {
+  getCustomerData(zahteva, (customers) => {
+    if (!customers) odgovor.sendStatus(500);
+    else odgovor.send(customers);
+  });
+});
+
+streznik.get("/companyTypes", (zahteva, odgovor) => {
+  odgovor.send(tipiPodjetij);
+});
 // Prikaz začetne strani
 streznik.get("/", (zahteva, odgovor) => {
   vrniSeznamFilmov((napaka, vrstice) => {
@@ -329,18 +369,31 @@ streznik.get("/najdi_sorodnika/:priimek", (zahteva, odgovor) => {
 
 // Registracija novega uporabnika
 streznik.post("/prijava", (zahteva, odgovor) => {
+  const formValues = zahteva.body;
   pb.run(
     "INSERT INTO Customer \
        (FirstName, LastName, Company, Address, City, State, \
         Country, PostalCode, Phone, Fax, Email, SupportRepId) \
-     VALUES \
-       ($fn, $ln, $com, $addr, $city, $state, $country, $pc, $phone, \
-        $fax, $email, $sri)",
+        VALUES \
+        ('"+formValues.FirstName+"', \
+        '"+formValues.LastName+"', \
+        '"+formValues.CompanyString+"', \
+        '"+formValues.Address+"', \
+        '"+formValues.City+"', \
+        '"+formValues.State+"' , \
+        '"+formValues.Country+"', \
+        '"+formValues.PostalCode+"', \
+        '"+formValues.Phone+"', \
+        '"+formValues.Fax+"', \
+        '"+formValues.Email+"', \
+        '"+formValues.SupportReqId+"')",
     {},
     (napaka) => {
       odgovor.end();
     }
   );
+  zahteva.flash('error', 'Some error occured!')
+  odgovor.redirect('/prijava');
 });
 
 // Prikaz strani za prijavo
@@ -353,6 +406,7 @@ streznik.get("/prijava", (zahteva, odgovor) => {
         filmiIzRacuna(racuni[i].InvoiceId, (napaka, vrstice) => {});
 
       odgovor.render("prijava", {
+        error: zahteva.flash('error'),
         sporocilo: "",
         prijavniGumb: "Prijava stranke",
         podnaslov: "Prijavna stran",
