@@ -1,0 +1,3 @@
+var sorodnik;
+
+$(document).ready(() => {});
