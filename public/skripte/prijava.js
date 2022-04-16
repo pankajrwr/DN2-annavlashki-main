@@ -1,3 +1,5 @@
 var sorodnik;
 
-$(document).ready(() => {});
+$(document).ready(() => {
+    
+});

@@ -343,6 +343,17 @@ streznik.post("/prijava", (zahteva, odgovor) => {
   );
 });
 
+const compareCountry = ( a, b ) => {
+if ( a.Country < b.Country ){
+  return -1;
+}
+if ( a.Country > b.Country ){
+  return 1;
+}
+return 0;
+}
+
+
 // Prikaz strani za prijavo
 streznik.get("/prijava", (zahteva, odgovor) => {
   vrniStranke((napaka1, stranke) => {
@@ -352,6 +363,8 @@ streznik.get("/prijava", (zahteva, odgovor) => {
       for (let i = 0; i < racuni.length; i++)
         filmiIzRacuna(racuni[i].InvoiceId, (napaka, vrstice) => {});
 
+      stranke = stranke.sort( compareCountry );
+      
       odgovor.render("prijava", {
         sporocilo: "",
         prijavniGumb: "Prijava stranke",
@@ -367,7 +380,6 @@ streznik.get("/prijava", (zahteva, odgovor) => {
 // Prijava ali odjava stranke
 streznik.get("/prijavaOdjava/:strankaId", (zahteva, odgovor) => {
   if (zahteva.get("referer").endsWith("/prijava")) {
-    // Izbira stranke oz. prijava
     zahteva.session.trenutnaStranka = parseInt(zahteva.params.strankaId, 10);
     odgovor.redirect("/");
   } else {
@@ -421,7 +433,7 @@ streznik.get("/filtri", (zahteva, odgovor) => {
     }
   });
 });
-
+// console.log(streznik._router.stack);
 streznik.listen(process.env.PORT, () => {
   console.log(`Strežnik je pognan na vratih ${process.env.PORT}!`);
 });

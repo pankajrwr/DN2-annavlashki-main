@@ -182,6 +182,9 @@
               {{stranka.FirstName}}
               {{stranka.LastName}},
               {{stranka.Email}}
+              {{#if stranka.Company}}
+              ({{stranka.Company}})
+              {{/if}}
             </option>
           {{/each}}
         </select>
