@@ -10,6 +10,19 @@ const formidable = require("formidable");
 // Priprava strežnika
 const express = require("express");
 const streznik = express();
+const exphbs = require('express-handlebars');
+streznik.engine('hbs', exphbs.engine({
+  defaultLayout: 'layout',
+  extname: '.hbs',
+  helpers: {
+    saveCountryName : (countryValue, options) => {
+        options.data.root['Country'] = countryValue;
+    },
+    blnCountryExists: (countryValue, options) => {
+      return options.data.root['Country'] == countryValue;
+    }
+  }
+}));
 streznik.set("view engine", "hbs");
 streznik.use(express.static("public"));
 
@@ -319,7 +332,6 @@ streznik.get("/najdi_sorodnika/:priimek", (zahteva, odgovor) => {
   let priimek = zahteva.params.priimek;
   najdiStrankoPoPriimku(priimek, (napaka, stranka) => {
     if (napaka) {
-      console.log(napaka);
       odgovor.end();
     } else {
       odgovor.send(stranka);
@@ -433,7 +445,6 @@ streznik.get("/filtri", (zahteva, odgovor) => {
     }
   });
 });
-// console.log(streznik._router.stack);
 streznik.listen(process.env.PORT, () => {
   console.log(`Strežnik je pognan na vratih ${process.env.PORT}!`);
 });

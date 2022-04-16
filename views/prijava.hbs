@@ -177,7 +177,12 @@
         >
           {{#each seznamStrank as |stranka|}}
             <option value="{{stranka.CustomerId}}" style="size:50%">
-              {{{stranka.Country}}}
+              {{#if (blnCountryExists stranka.Country)}}
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+              {{else}}
+              {{stranka.Country}}
+              {{/if}}
+              {{ saveCountryName stranka.Country}}
               |
               {{stranka.FirstName}}
               {{stranka.LastName}},
