@@ -9,7 +9,26 @@ const formidable = require("formidable");
 
 // Priprava strežnika
 const express = require("express");
+const exphbs = require('express-handlebars');
 const streznik = express();
+
+streznik.engine('hbs', exphbs.engine({
+  defaultLayout: 'layout',
+  extname: '.hbs',
+  helpers: {
+      getFlagUrl(lang) {
+        if(lang.includes(',')){
+          lang = lang.split(',')[0]
+        }
+
+          if (lang == 'en' || lang == 'zh' || lang == 'ja' || lang == 'xx' || lang == 'fa') {
+            lang = 'gb';
+          }
+          
+          return 'https://flagcdn.com/16x12/'+lang+'.png';
+      }
+  }
+}))
 streznik.set("view engine", "hbs");
 streznik.use(express.static("public"));
 
@@ -319,7 +338,6 @@ streznik.get("/najdi_sorodnika/:priimek", (zahteva, odgovor) => {
   let priimek = zahteva.params.priimek;
   najdiStrankoPoPriimku(priimek, (napaka, stranka) => {
     if (napaka) {
-      console.log(napaka);
       odgovor.end();
     } else {
       odgovor.send(stranka);

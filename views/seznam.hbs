@@ -36,7 +36,10 @@
                 >{{film.naslov}}</span></strong>
               <i class="fas fa-globe-europe"></i><span
                 class="jezik"
-              >{{film.jeziki}}</span>
+              >
+              
+              <img src="{{getFlagUrl film.jeziki}}" />
+              </span>
               <span class="text-nowrap"><i class="fas fa-signal"></i><span
                   class="ocena"
                 >{{film.ocena}}</span></span>
@@ -80,5 +83,13 @@
   </div>
 </div>
 
-<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+<script type="text/javascript" src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
 <script src="skripte/seznam.js"></script>
+<style>
+  .opaque {
+    opacity: 0.3;
+  }
+  .clear{
+    opacity: 1;
+  }
+</style>
