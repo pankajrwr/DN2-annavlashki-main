@@ -160,7 +160,19 @@ const strankaIzRacuna = (racunId, povratniKlic) => {
 
 // Vrni podrobnosti o stranki iz seje
 const strankaIzSeje = (zahteva, povratniKlic) => {
-  povratniKlic(false);
+  const clientId = zahteva.session.trenutnaStranka;
+  if(clientId){
+    // call a function which returns customer detail
+    getCustomerDetailsById(clientId, (napaka, stranka) => {
+      if (napaka) {
+        povratniKlic(false);
+      } else {
+        povratniKlic(stranka);
+      }
+    });
+  }else{
+    povratniKlic(false);
+  }
 };
 
 // Vrni stranke iz podatkovne baze
@@ -181,6 +193,19 @@ const vrniRacune = (povratniKlic) => {
      FROM   Customer, Invoice \
      WHERE  Customer.CustomerId = Invoice.CustomerId",
     (napaka, vrstice) => povratniKlic(napaka, vrstice)
+  );
+};
+
+
+// Vrni stranko glede na priimek podan z velikimi tiskanimi črkami
+const getCustomerDetailsById = (customerId, povratniKlic) => {
+  pb.get(
+    "SELECT * \
+     FROM   Customer \
+     WHERE  Customer.CustomerId == $customerId \
+     LIMIT  1",
+    { $customerId: customerId },
+    (napaka, stranka) => povratniKlic(napaka, stranka)
   );
 };
 
@@ -295,7 +320,6 @@ streznik.get("/izpisiRacun/:oblika", (zahteva, odgovor) => {
           povzetek.vsotaVrednosti += film.vrednost;
           povzetek.vsotaPopustov += film.popust;
         });
-
         odgovor.setHeader("Content-Type", "text/xml");
         odgovor.render("eslog", {
           vizualiziraj: zahteva.params.oblika == "html",
@@ -319,7 +343,6 @@ streznik.get("/najdi_sorodnika/:priimek", (zahteva, odgovor) => {
   let priimek = zahteva.params.priimek;
   najdiStrankoPoPriimku(priimek, (napaka, stranka) => {
     if (napaka) {
-      console.log(napaka);
       odgovor.end();
     } else {
       odgovor.send(stranka);
