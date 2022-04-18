@@ -306,8 +306,8 @@ streznik.get("/izpisiRacun/:oblika", (zahteva, odgovor) => {
           film.cena = film.trajanje * 0.015;
           film.vrednost = film.kolicina * film.cena;
           film.davcnaStopnja = 22;
-          let movieYear = parseInt(film.datumIzdaje.split('-')[0])
-          let currentYear = new Date().getFullYear()
+          let movieYear = parseInt(film.datumIzdaje.split('-')[0]);
+          let currentYear = new Date().getFullYear();
           film.popustStopnja = Math.floor((currentYear-movieYear)/10)*4;
           film.popust = film.kolicina * film.cena * (film.popustStopnja / 100);
 
