@@ -301,7 +301,7 @@ streznik.get("/izpisiRacun/:oblika", (zahteva, odgovor) => {
           vsotaPopustov: 0,
         };
 
-        filmi.forEach((film, i) => {
+        filmi.forEach((film, i) => { 
           film.zapSt = i + 1;
           film.cena = film.trajanje * 0.015;
           film.vrednost = film.kolicina * film.cena;
