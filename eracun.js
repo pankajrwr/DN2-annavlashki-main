@@ -359,7 +359,6 @@ streznik.get("/najdi_sorodnika/:priimek", (zahteva, odgovor) => {
   let priimek = zahteva.params.priimek;
   najdiStrankoPoPriimku(priimek, (napaka, stranka) => {
     if (napaka) {
-      console.log(napaka);
       odgovor.end();
     } else {
       odgovor.send(stranka);
