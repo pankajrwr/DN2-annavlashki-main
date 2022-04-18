@@ -445,6 +445,7 @@ streznik.get("/filtri", (zahteva, odgovor) => {
     }
   });
 });
+
 streznik.listen(process.env.PORT, () => {
   console.log(`Strežnik je pognan na vratih ${process.env.PORT}!`);
 });
